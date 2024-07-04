@@ -33,6 +33,8 @@ EXCLUDE_PATTERNS=(
     "README.md"
     "install.sh"
     "LICENSE"
+    ".gitconfig_tepmlate"
+    "generate_gitconfig.sh"
 )
 
 # dotfilesディレクトリ内のファイルを再帰的に処理
@@ -161,6 +163,10 @@ fi
 # シンボリックリンクの作成
 echo "Creating symlinks..."
 process_directory "$DOTFILES_DIR"
+
+# .gitconfigの生成
+source "$DOTFILES_DIR/generate_gitconfig.sh"
+generate_gitconfig "$DOTFILES_DIR"
 
 # preztoの設定ファイルのシンボリックリンクを作成
 for rcfile in "${ZDOTDIR:-$HOME}"/.zprezto/runcoms/*; do

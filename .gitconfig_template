@@ -1,0 +1,12 @@
+[user]
+    name = YOUR_NAME
+    email = YOUR_EMAIL
+
+[core]
+    editor = nvim
+
+[alias]
+    gc = checkout
+    gb = branch
+    gcm = commit
+    gs = status
