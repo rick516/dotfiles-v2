@@ -26,6 +26,41 @@ function fzf-cd() {
 }
 alias fcd='fzf-cd'
 
+# ファイル内容の検索関数
+function fzf_rg_search() {
+  if [ ! "$#" -gt 0 ]; then echo "検索語を入力してください"; return 1; fi
+  local file
+  file=$(rg --files-with-matches --no-messages "$1" | fzf --preview "highlight -O ansi -l {} 2> /dev/null | rg --colors 'match:bg:yellow' --ignore-case --pretty --context 10 '$1' || rg --ignore-case --pretty --context 10 '$1' {}")
+  if [[ -n "$file" ]]; then
+    nvim "$file"
+  fi
+}
+
+alias fs='fzf_rg_search'
+
+# ファイル内検索 + 拡張子フィルター 
+function fzf_rg_search_type() {
+  if [ "$#" -lt 2 ]; then echo "使用法: fst 検索語 ファイルタイプ"; return 1; fi
+  local file
+  file=$(rg --type "$2" --files-with-matches --no-messages "$1" | fzf --preview "highlight -O ansi -l {} 2> /dev/null | rg --colors 'match:bg:yellow' --ignore-case --pretty --context 10 '$1' || rg --ignore-case --pretty --context 10 '$1' {}")
+  if [[ -n "$file" ]]; then
+    nvim "$file"
+  fi
+}
+
+alias fst='fzf_rg_search_type'
+
+# 大文字小文字区別検索
+function fzf_rg_search_case_sensitive() {
+  if [ ! "$#" -gt 0 ]; then echo "検索語を入力してください"; return 1; fi
+  local file
+  file=$(rg --case-sensitive --files-with-matches --no-messages "$1" | fzf --preview "highlight -O ansi -l {} 2> /dev/null | rg --colors 'match:bg:yellow' --pretty --context 10 '$1' || rg --pretty --context 10 '$1' {}")
+  if [[ -n "$file" ]]; then
+    nvim "$file"
+  fi
+}
+alias fsc='fzf_rg_search_case_sensitive'
+
 # SSH接続時に背景色を変更
 if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
     zstyle ':prezto:module:prompt:powerlevel10k' preset 'remote'
@@ -40,7 +75,7 @@ alias ga='git add'
 alias gc='git checkout'
 alias gb='git branch'
 alias gg='git grep -n'
-alias gc='git commit -m'
+alias gcm='git commit -m'
 alias gps='git push origin'
 alias gl='git log --oneline --graph --decorate'
 
