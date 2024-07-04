@@ -1,31 +1,69 @@
 #!/bin/bash
 
-# dotfilesディレクトリへ移動
-DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd "$DOTFILES_DIR"
+#!/bin/bash
 
-# バックアップ用ディレクトリ
-BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
+set -e
+
+DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # シンボリックリンクを作成する関数
 create_symlink() {
     local src="$1"
     local dest="$2"
-    local backup="$BACKUP_DIR/${dest##*/}"
+    local backup_dir="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
 
     if [ -e "$dest" ]; then
         if [ ! -L "$dest" ]; then
-            echo "Backing up $dest to $backup"
-            mkdir -p "$(dirname "$backup")"
-            mv "$dest" "$backup"
+            echo "Backing up $dest to $backup_dir"
+            mkdir -p "$backup_dir"
+            mv "$dest" "$backup_dir/"
         else
             rm "$dest"
         fi
     fi
 
     echo "Creating symlink: $dest -> $src"
-    mkdir -p "$(dirname "$dest")"
     ln -s "$src" "$dest"
+}
+
+# 除外するファイルやディレクトリのパターン
+EXCLUDE_PATTERNS=(
+    ".git"
+    ".gitignore"
+    "README.md"
+    "install.sh"
+    "LICENSE"
+)
+
+# dotfilesディレクトリ内のファイルを再帰的に処理
+process_directory() {
+    local dir="$1"
+    local rel_path="${dir#$DOTFILES_DIR/}"
+    
+    for item in "$dir"/*; do
+        local item_rel_path="${item#$DOTFILES_DIR/}"
+        local exclude=false
+
+        # 除外パターンをチェック
+        for pattern in "${EXCLUDE_PATTERNS[@]}"; do
+            if [[ "$item_rel_path" == $pattern* ]]; then
+                exclude=true
+                break
+            fi
+        done
+
+        if [ "$exclude" = true ]; then
+            echo "Skipping excluded item: $item_rel_path"
+            continue
+        fi
+
+        if [ -d "$item" ]; then
+            process_directory "$item"
+        elif [ -f "$item" ]; then
+            local dest="$HOME/$item_rel_path"
+            create_symlink "$item" "$dest"
+        fi
+    done
 }
 
 # Neovimのインストール
@@ -60,6 +98,38 @@ install_neovim() {
     fi
 }
 
+# tmuxのインストール
+install_tmux() {
+    if ! command -v tmux &> /dev/null; then
+        echo "tmux is not installed. Installing tmux..."
+        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            if command -v apt-get &> /dev/null; then
+                sudo apt-get update
+                sudo apt-get install -y tmux
+            elif command -v dnf &> /dev/null; then
+                sudo dnf install -y tmux
+            elif command -v pacman &> /dev/null; then
+                sudo pacman -S tmux
+            else
+                echo "Unsupported package manager. Please install tmux manually."
+                return 1
+            fi
+        elif [[ "$OSTYPE" == "darwin"* ]]; then
+            if command -v brew &> /dev/null; then
+                brew install tmux
+            else
+                echo "Homebrew not found. Please install Homebrew and try again."
+                return 1
+            fi
+        else
+            echo "Unsupported operating system. Please install tmux manually."
+            return 1
+        fi
+    else
+        echo "tmux is already installed."
+    fi
+}
+
 # preztoのインストール
 if [ ! -d "${ZDOTDIR:-$HOME}/.zprezto" ]; then
     git clone --recursive https://github.com/sorin-ionescu/prezto.git "${ZDOTDIR:-$HOME}/.zprezto"
@@ -79,11 +149,18 @@ fi
 # Neovimのインストール
 install_neovim
 
-# symlinks.txtからシンボリックリンクを作成
-while IFS=: read -r src dest
-do
-    create_symlink "$DOTFILES_DIR/$src" "$HOME/$dest"
-done < symlinks.txt
+# tmuxのインストールと設定
+install_tmux
+if [ $? -eq 0 ]; then
+    create_symlink "$DOTFILES_DIR/.tmux.conf" "$HOME/.tmux.conf"
+    echo "tmux configuration has been set up."
+else
+    echo "Failed to set up tmux. Please install tmux manually and run this script again."
+fi
+
+# シンボリックリンクの作成
+echo "Creating symlinks..."
+process_directory "$DOTFILES_DIR"
 
 # preztoの設定ファイルのシンボリックリンクを作成
 for rcfile in "${ZDOTDIR:-$HOME}"/.zprezto/runcoms/*; do

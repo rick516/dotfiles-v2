@@ -48,6 +48,7 @@ alias gl='git log --oneline --graph --decorate'
 alias l='ls -lah'
 alias ..='cd ..'
 alias ...='cd ../..'
+alias sz='source ~/.zshrc'
 
 # nvimエイリアス
 alias vim='nvim'
