@@ -1,10 +1,39 @@
 #!/bin/bash
 
-#!/bin/bash
-
 set -e
 
 DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Homebrewのインストール
+install_homebrew() {
+    if ! command -v brew &> /dev/null; then
+        echo "Installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    else
+        echo "Homebrew is already installed."
+    fi
+}
+
+# 必要なパッケージのインストール
+install_packages() {
+    echo "Installing necessary packages..."
+    brew install fzf ripgrep neovim tmux zsh
+    $(brew --prefix)/opt/fzf/install --all
+}
+
+# Neovimの設定ファイルにfzfの設定を追加
+setup_nvim_fzf() {
+    local nvim_config="$HOME/.config/nvim/init.vim"
+    if [ -f "$nvim_config" ]; then
+        if ! grep -q "set rtp+=/opt/homebrew/opt/fzf" "$nvim_config"; then
+            echo "Adding fzf to Neovim configuration..."
+            echo "set rtp+=/opt/homebrew/opt/fzf" >> "$nvim_config"
+        fi
+    else
+        echo "Neovim configuration file not found. Please set up Neovim first."
+    fi
+}
+
 
 # シンボリックリンクを作成する関数
 create_symlink() {
@@ -68,79 +97,18 @@ process_directory() {
     done
 }
 
-# Neovimのインストール
-install_neovim() {
-    if ! command -v nvim &> /dev/null; then
-        echo "Neovim is not installed. Installing Neovim..."
-        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-            if command -v apt-get &> /dev/null; then
-                sudo apt-get update
-                sudo apt-get install -y neovim
-            elif command -v dnf &> /dev/null; then
-                sudo dnf install -y neovim
-            elif command -v pacman &> /dev/null; then
-                sudo pacman -S neovim
-            else
-                echo "Unsupported package manager. Please install Neovim manually."
-                return 1
-            fi
-        elif [[ "$OSTYPE" == "darwin"* ]]; then
-            if command -v brew &> /dev/null; then
-                brew install neovim
-            else
-                echo "Homebrew not found. Please install Homebrew and try again."
-                return 1
-            fi
-        else
-            echo "Unsupported operating system. Please install Neovim manually."
-            return 1
-        fi
-    else
-        echo "Neovim is already installed."
-    fi
-}
+# シンボリックリンクの作成
+echo "Creating symlinks..."
+process_directory "$DOTFILES_DIR"
 
-# tmuxのインストール
-install_tmux() {
-    if ! command -v tmux &> /dev/null; then
-        echo "tmux is not installed. Installing tmux..."
-        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-            if command -v apt-get &> /dev/null; then
-                sudo apt-get update
-                sudo apt-get install -y tmux
-            elif command -v dnf &> /dev/null; then
-                sudo dnf install -y tmux
-            elif command -v pacman &> /dev/null; then
-                sudo pacman -S tmux
-            else
-                echo "Unsupported package manager. Please install tmux manually."
-                return 1
-            fi
-        elif [[ "$OSTYPE" == "darwin"* ]]; then
-            if command -v brew &> /dev/null; then
-                brew install tmux
-            else
-                echo "Homebrew not found. Please install Homebrew and try again."
-                return 1
-            fi
-        else
-            echo "Unsupported operating system. Please install tmux manually."
-            return 1
-        fi
-    else
-        echo "tmux is already installed."
-    fi
-}
+# 必要なライブラリのインストールおよびセットアップ
+install_homebrew
+install_packages
+setup_nvim_fzf
 
 # preztoのインストール
 if [ ! -d "${ZDOTDIR:-$HOME}/.zprezto" ]; then
     git clone --recursive https://github.com/sorin-ionescu/prezto.git "${ZDOTDIR:-$HOME}/.zprezto"
-fi
-
-# fzfのインストール
-if [ ! -d ~/.fzf ]; then
-    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-    ~/.fzf/install --all
 fi
 
 # powerline10kのインストール（preztoに含まれていない場合）
@@ -148,32 +116,9 @@ if [ ! -d ${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/external/powerlevel10k ]; th
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/external/powerlevel10k
 fi
 
-# Neovimのインストール
-install_neovim
-
-# tmuxのインストールと設定
-install_tmux
-if [ $? -eq 0 ]; then
-    create_symlink "$DOTFILES_DIR/.tmux.conf" "$HOME/.tmux.conf"
-    echo "tmux configuration has been set up."
-else
-    echo "Failed to set up tmux. Please install tmux manually and run this script again."
-fi
-
-# シンボリックリンクの作成
-echo "Creating symlinks..."
-process_directory "$DOTFILES_DIR"
-
 # .gitconfigの生成
 source "$DOTFILES_DIR/generate_gitconfig.sh"
 generate_gitconfig "$DOTFILES_DIR"
-
-# preztoの設定ファイルのシンボリックリンクを作成
-for rcfile in "${ZDOTDIR:-$HOME}"/.zprezto/runcoms/*; do
-  if [ "$(basename "$rcfile")" != "README.md" ]; then
-    create_symlink "$rcfile" "${ZDOTDIR:-$HOME}/.${rcfile##*/}"
-  fi
-done
 
 # Neovimプラグインのインストール
 if command -v nvim >/dev/null 2>&1; then
@@ -182,6 +127,14 @@ if command -v nvim >/dev/null 2>&1; then
 else
     echo "Neovim is not installed. Please install Neovim and run this script again."
 fi
+
+
+# preztoの設定ファイルのシンボリックリンクを作成
+for rcfile in "${ZDOTDIR:-$HOME}"/.zprezto/runcoms/*; do
+  if [ "$(basename "$rcfile")" != "README.md" ]; then
+    create_symlink "$rcfile" "${ZDOTDIR:-$HOME}/.${rcfile##*/}"
+  fi
+done
 
 echo "Installation complete! Please restart your terminal or run 'source ~/.zshrc' to apply the changes."
 echo "To customize your zsh prompt further, run 'p10k configure' after restarting your terminal."

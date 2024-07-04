@@ -17,7 +17,31 @@ vim.opt.signcolumn = "yes"  -- サインカラムを常に表示
 vim.opt.updatetime = 50  -- より高速な更新
 vim.opt.colorcolumn = "80"  -- 80列目にラインを表示
 
--- キーマッピング
+-- クリップボード設定
+vim.opt.clipboard = "unnamedplus"
+
+-- macOSのクリップボードサポートの確認
+if vim.fn.has('mac') == 1 then
+  vim.g.clipboard = {
+    name = 'macOS-clipboard',
+    copy = {
+      ['+'] = 'pbcopy',
+      ['*'] = 'pbcopy',
+    },
+    paste = {
+      ['+'] = 'pbpaste',
+      ['*'] = 'pbpaste',
+    },
+    cache_enabled = 0,
+  }
+end
+
+-- オプション: キーマッピング
+-- ジュリップボード
+vim.api.nvim_set_keymap('n', '<leader>y', '"+y', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '<leader>y', '"+y', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>p', '"+p', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '<leader>p', '"+p', { noremap = true, silent = true })
 vim.g.mapleader = " "  -- リーダーキーをスペースに設定
 
 -- プラグインマネージャー（packer.nvim）のブートストラップ
@@ -33,7 +57,6 @@ local ensure_packer = function()
 end
 
 local packer_bootstrap = ensure_packer()
-
 
 -- プラグインの設定
 require('packer').startup(function(use)
