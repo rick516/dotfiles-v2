@@ -136,3 +136,4 @@ export MANPAGER='nvim +Man!'
 
 # Optional: Use Neovim for viewing git diffs
 export GIT_EDITOR='nvim'
+[[ ! -f ${ZDOTDIR:-$HOME}/.p10k.zsh ]] || source ${ZDOTDIR:-$HOME}/.p10k.zsh
