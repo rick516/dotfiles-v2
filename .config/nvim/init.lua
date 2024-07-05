@@ -1,7 +1,6 @@
 -- 基本設定
 vim.opt.number = true  -- 行番号を表示
-vim.opt.relativenumber = true  -- 相対行番号を表示
-vim.opt.wrap = false  -- 長い行を折り返さない
+vim.opt.wrap = true  -- 長い行を折り返さない
 vim.opt.expandtab = true  -- タブをスペースに変換
 vim.opt.tabstop = 2  -- タブ幅を2に設定
 vim.opt.shiftwidth = 2  -- インデント幅を2に設定
@@ -175,3 +174,4 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end, opts)
   end,
 })
+vim.opt.rtp:append('/opt/homebrew/opt/fzf')
