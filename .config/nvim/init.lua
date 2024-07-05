@@ -60,6 +60,7 @@ local packer_bootstrap = ensure_packer()
 -- プラグインの設定
 require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'  -- パッケージマネージャー
+  use {"akinsho/toggleterm.nvim", tag = '*'}  -- ToggleTermプラグイン
   use 'nvim-treesitter/nvim-treesitter'  -- シンタックスハイライト
   use {
     'nvim-telescope/telescope.nvim',  -- ファジーファインダー
@@ -175,3 +176,18 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 vim.opt.rtp:append('/opt/homebrew/opt/fzf')
+
+-- ターミナル切り替え機能
+local Terminal = require('toggleterm.terminal').Terminal
+local lazygit = Terminal:new({ cmd = "lazygit", hidden = true })
+
+function _lazygit_toggle()
+  lazygit:toggle()
+end
+
+vim.api.nvim_set_keymap("n", "<leader>g", "<cmd>lua _lazygit_toggle()<CR>", {noremap = true, silent = true})
+
+-- Neovimとターミナル間の切り替え
+vim.api.nvim_set_keymap('t', '<C-\\>', [[<C-\><C-n>]], {noremap = true})
+vim.api.nvim_set_keymap('n', '<leader>t', ':ToggleTerm<CR>', {noremap = true})
+vim.api.nvim_set_keymap('t', '<leader>t', [[<C-\><C-n>:ToggleTerm<CR>]], {noremap = true})

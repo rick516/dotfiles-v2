@@ -82,6 +82,7 @@ alias gl='git log --oneline --graph --decorate'
 
 # その他の便利なエイリアス
 alias l='ls -lah'
+alias lsa='ls -a'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias sz='source ~/.zshrc'
@@ -138,3 +139,44 @@ export MANPAGER='nvim +Man!'
 # Optional: Use Neovim for viewing git diffs
 export GIT_EDITOR='nvim'
 [[ ! -f ${ZDOTDIR:-$HOME}/.p10k.zsh ]] || source ${ZDOTDIR:-$HOME}/.p10k.zsh
+
+# シンタックスハイライトの設定
+# 基本的な設定のみを適用し、エラーを回避する
+() {
+    # デフォルトのハイライトスタイルを設定
+    ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
+    
+    # 基本的なスタイルのみを設定
+    typeset -A ZSH_HIGHLIGHT_STYLES
+    ZSH_HIGHLIGHT_STYLES[default]=none
+    ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
+    ZSH_HIGHLIGHT_STYLES[reserved-word]=fg=yellow
+    ZSH_HIGHLIGHT_STYLES[alias]=fg=green
+    ZSH_HIGHLIGHT_STYLES[builtin]=fg=green
+    ZSH_HIGHLIGHT_STYLES[function]=fg=green
+    ZSH_HIGHLIGHT_STYLES[command]=fg=green
+    ZSH_HIGHLIGHT_STYLES[precommand]=fg=green,underline
+    ZSH_HIGHLIGHT_STYLES[commandseparator]=none
+    ZSH_HIGHLIGHT_STYLES[hashed-command]=fg=green
+    ZSH_HIGHLIGHT_STYLES[path]=fg=cyan
+    ZSH_HIGHLIGHT_STYLES[globbing]=fg=blue
+    ZSH_HIGHLIGHT_STYLES[history-expansion]=fg=blue
+    ZSH_HIGHLIGHT_STYLES[single-hyphen-option]=none
+    ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=none
+    ZSH_HIGHLIGHT_STYLES[back-quoted-argument]=none
+    ZSH_HIGHLIGHT_STYLES[single-quoted-argument]=fg=yellow
+    ZSH_HIGHLIGHT_STYLES[double-quoted-argument]=fg=yellow
+    ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=cyan
+    ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=cyan
+    ZSH_HIGHLIGHT_STYLES[assign]=none
+}
+
+# シンタックスハイライトを有効化
+if [[ -f ${ZDOTDIR:-$HOME}/.zprezto/modules/syntax-highlighting/external/zsh-syntax-highlighting.zsh ]]; then
+    source ${ZDOTDIR:-$HOME}/.zprezto/modules/syntax-highlighting/external/zsh-syntax-highlighting.zsh
+else
+    echo "警告: zsh-syntax-highlighting.zsh が見つかりません。シンタックスハイライトは無効です。" >&2
+fi
+
+# Neovimとターミナルを切り替えるエイリアス
+alias nvim-toggle='nvim -c "ToggleTerm"'
