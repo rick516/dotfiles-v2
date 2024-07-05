@@ -77,6 +77,7 @@ alias gb='git branch'
 alias gg='git grep -n'
 alias gcm='git commit -m'
 alias gps='git push origin'
+alias gpl='git pull origin'
 alias gl='git log --oneline --graph --decorate'
 
 # その他の便利なエイリアス
