@@ -194,12 +194,7 @@ install_prezto() {
 
     # preztoのプロンプト設定を確認
     local zpreztorc="${ZDOTDIR:-$HOME}/.zpreztorc"
-    if [ -f "$zpreztorc" ]; then
-        if ! grep -q "zstyle ':prezto:module:prompt' theme 'sorin'" "$zpreztorc"; then
-            log "Adding Sorin theme to .zpreztorc"
-            echo "zstyle ':prezto:module:prompt' theme 'sorin'" >> "$zpreztorc"
-        fi
-    else
+    if [ ! -f "$zpreztorc" ]; then
         error ".zpreztorc file not found"
     fi
 }
