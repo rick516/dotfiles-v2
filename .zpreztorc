@@ -255,3 +255,4 @@ zstyle ':prezto:module:prompt' theme 'powerlevel10k'
 # behavior.
 # zstyle ':prezto:module:utility' safe-ops 'yes'
 
+zstyle ':prezto:module:prompt' theme 'sorin'

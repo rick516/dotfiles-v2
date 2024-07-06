@@ -1,9 +1,10 @@
 #!/bin/bash
+# ディレクトリ名は/dotfiles-v2です。
 
 set -e
 
 DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
+BACKUP_DIR="$HOME/dotfiles-v2/backups/$(date +%Y%m%d_%H%M%S)"
 
 # ログ関数
 log() {
@@ -48,15 +49,48 @@ setup_neovim() {
         mkdir -p "$nvim_config_dir"
     fi
 
-    if [ ! -f "$nvim_config" ]; then
-        log "Creating Neovim configuration file..."
-        cp "$DOTFILES_DIR/init.lua" "$nvim_config" || error "Failed to create Neovim config"
+    # Packerのインストール
+    local packer_dir="$HOME/.local/share/nvim/site/pack/packer/start/packer.nvim"
+    if [ ! -d "$packer_dir" ]; then
+        log "Installing Packer..."
+        git clone --depth 1 https://github.com/wbthomason/packer.nvim "$packer_dir" || error "Failed to install Packer"
     fi
 
-    if ! grep -q "vim.opt.rtp:append('/opt/homebrew/opt/fzf')" "$nvim_config"; then
-        log "Adding fzf to Neovim configuration..."
-        echo "vim.opt.rtp:append('/opt/homebrew/opt/fzf')" >> "$nvim_config" || error "Failed to add fzf to Neovim config"
-    fi
+    log "Creating Neovim configuration file..."
+    cat << EOF > "$nvim_config"
+-- Basic Neovim configuration
+vim.opt.number = true
+vim.opt.expandtab = true
+vim.opt.shiftwidth = 2
+
+-- Ensure Packer is installed
+local ensure_packer = function()
+  local fn = vim.fn
+  local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
+  if fn.empty(fn.glob(install_path)) > 0 then
+    fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+    vim.cmd [[packadd packer.nvim]]
+    return true
+  end
+  return false
+end
+
+local packer_bootstrap = ensure_packer()
+
+-- Packer setup
+require('packer').startup(function(use)
+  use 'wbthomason/packer.nvim'
+  -- Add your plugins here
+end)
+
+if packer_bootstrap then
+  require('packer').sync()
+end
+
+vim.opt.rtp:append('/opt/homebrew/opt/fzf')
+EOF
+
+    log "Neovim configuration file created at $nvim_config"
 }
 
 setup_config_file() {
@@ -129,6 +163,8 @@ EXCLUDE_PATTERNS=(
     "LICENSE"
     ".gitconfig_template"
     "generate_gitconfig.sh"
+    "cleanup.sh"
+    "backups"
 )
 
 # preztoのインストールと設定
@@ -138,7 +174,8 @@ install_prezto() {
         log "Installing prezto..."
         git clone --recursive https://github.com/sorin-ionescu/prezto.git "${ZDOTDIR:-$HOME}/.zprezto" || error "Failed to install prezto"
     else
-        log "prezto is already installed."
+        log "Updating prezto..."
+        cd "${ZDOTDIR:-$HOME}/.zprezto" && git pull && git submodule update --init --recursive
     fi
 
     # preztoの設定ファイルの処理
@@ -148,26 +185,19 @@ install_prezto() {
         local home_path="${ZDOTDIR:-$HOME}/.$file"
         local prezto_path="${ZDOTDIR:-$HOME}/.zprezto/runcoms/$file"
 
-        if [ -f "$dotfiles_path" ]; then
-            log "Using existing $file from dotfiles"
-            create_symlink "$dotfiles_path" "$home_path"
-        elif [ -f "$prezto_path" ]; then
+        if [ ! -f "$dotfiles_path" ]; then
             log "Copying $file from prezto to dotfiles"
             cp "$prezto_path" "$dotfiles_path"
-            create_symlink "$dotfiles_path" "$home_path"
-        else
-            log "Creating empty $file in dotfiles"
-            touch "$dotfiles_path"
-            create_symlink "$dotfiles_path" "$home_path"
         fi
+        create_symlink "$dotfiles_path" "$home_path"
     done
 
     # preztoのプロンプト設定を確認
     local zpreztorc="${ZDOTDIR:-$HOME}/.zpreztorc"
     if [ -f "$zpreztorc" ]; then
-        if ! grep -q "zstyle ':prezto:module:prompt' theme 'powerlevel10k'" "$zpreztorc"; then
-            log "Adding powerlevel10k theme to .zpreztorc"
-            echo "zstyle ':prezto:module:prompt' theme 'powerlevel10k'" >> "$zpreztorc"
+        if ! grep -q "zstyle ':prezto:module:prompt' theme 'sorin'" "$zpreztorc"; then
+            log "Adding Sorin theme to .zpreztorc"
+            echo "zstyle ':prezto:module:prompt' theme 'sorin'" >> "$zpreztorc"
         fi
     else
         error ".zpreztorc file not found"
@@ -255,7 +285,8 @@ generate_gitconfig() {
 install_neovim_plugins() {
     if command -v nvim >/dev/null 2>&1; then
         log "Installing Neovim plugins..."
-        nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync' || error "Failed to install Neovim plugins"
+        nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync' || log "Warning: PackerSync might have failed, but continuing..."
+        nvim --headless -c 'PackerInstall' -c 'qa!'
     else
         error "Neovim is not installed. Please install Neovim and run this script again."
     fi
@@ -265,7 +296,7 @@ install_neovim_plugins() {
 process_directory() {
     local dir="$1"
     local rel_path="${dir#$DOTFILES_DIR/}"
-    
+
     log "Processing directory: $dir"
     
     # 隠しファイルも含めて処理
@@ -313,7 +344,7 @@ process_directory() {
 main() {
     log "Starting dotfiles installation..."
 
-   install_homebrew
+    install_homebrew
     install_packages
     setup_neovim
     install_prezto
@@ -332,3 +363,8 @@ main() {
 # スクリプトの実行
 main
 
+log "Applying Powerlevel10k theme..."
+source ${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/external/powerlevel10k/powerlevel10k.zsh-theme
+
+log "Reloading zsh configuration..."
+exec zsh -l
