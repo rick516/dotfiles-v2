@@ -197,7 +197,13 @@ setup_dotfiles() {
 setup_ghostty_config() {
     local src="$DOTFILES_DIR/.config/ghostty/config"
     local dest="$HOME/Library/Application Support/com.mitchellh.ghostty/config"
-    [ -f "$src" ] && create_symlink "$src" "$dest"
+    if [ -f "$src" ]; then
+        log "Copying and expanding ghostty config to Library"
+        mkdir -p "$(dirname "$dest")"
+        [ -L "$dest" ] && rm "$dest"
+        cp "$src" "$dest"
+        sed -i '' "s|__HOME__|$HOME|g" "$dest"
+    fi
 }
 
 setup_fzf() {
