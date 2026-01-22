@@ -1,0 +1,31 @@
+---
+# aqua - Declarative CLI Version Manager
+# https://aquaproj.github.io/
+#
+# Usage:
+#   aqua install    # Install all packages
+#   aqua update     # Update packages to latest
+#   aqua list       # List installed packages
+
+registries:
+  - type: standard
+    ref: v4.232.0
+
+packages:
+  # Search & Navigation
+  - name: junegunn/fzf@v0.56.3
+  - name: BurntSushi/ripgrep@14.1.1
+
+  # Editor
+  - name: neovim/neovim@v0.10.2
+
+  # Shell Tools
+  - name: direnv/direnv@v2.35.0
+  - name: tmux/tmux@3.5a
+
+  # Terminal
+  - name: zellij-org/zellij@v0.41.2
+  - name: sxyazi/yazi@v0.4.2
+
+  # Git
+  - name: jesseduffield/lazygit@v0.44.1

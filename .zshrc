@@ -2,6 +2,10 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 export VOLTA_HOME="$HOME/.volta"
 export PATH="$VOLTA_HOME/bin:$PATH"
 
+# aqua (CLI version manager)
+export AQUA_ROOT_DIR="${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}"
+export PATH="$AQUA_ROOT_DIR/bin:$PATH"
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Preztoの設定
