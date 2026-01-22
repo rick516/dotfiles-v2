@@ -168,10 +168,20 @@ setup_dotfiles() {
         done
     fi
 
-    # .config directories
+    # .config directories (ghostty/zellijは__HOME__展開が必要なのでコピー)
     if [ -d "$DOTFILES_DIR/.config" ]; then
         for config_dir in "$DOTFILES_DIR/.config"/*; do
-            [ -d "$config_dir" ] && create_symlink "$config_dir" "$HOME/.config/$(basename "$config_dir")"
+            [ -d "$config_dir" ] || continue
+            local dir_name=$(basename "$config_dir")
+            if [[ "$dir_name" == "ghostty" || "$dir_name" == "zellij" ]]; then
+                # コピーして__HOME__を展開
+                log "Copying and expanding: $dir_name"
+                rm -rf "$HOME/.config/$dir_name"
+                cp -r "$config_dir" "$HOME/.config/$dir_name"
+                find "$HOME/.config/$dir_name" -type f -exec sed -i '' "s|__HOME__|$HOME|g" {} \;
+            else
+                create_symlink "$config_dir" "$HOME/.config/$dir_name"
+            fi
         done
     fi
 

@@ -21,7 +21,7 @@ cursor-style-blink = false
 mouse-hide-while-typing
 
 # 起動時にzellijをVSCode風レイアウトで起動
-command = ~/.local/bin/zellij-launch --layout vscode
+command = __HOME__/.local/bin/zellij-launch --layout vscode
 
 # コマンド終了後も表示を維持
 wait-after-command = true

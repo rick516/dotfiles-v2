@@ -1,8 +1,10 @@
 #!/bin/bash
 # git-dashboard: 複数リポジトリの状態一覧 + lazygitで詳細表示
 
-# PATHにHomebrewを追加（zellij経由で起動時に必要）
-export PATH="/opt/homebrew/bin:$PATH"
+# PATH設定（aqua + Homebrew）
+export AQUA_ROOT_DIR="${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}"
+export AQUA_GLOBAL_CONFIG="$HOME/dotfiles-v2/aqua.yaml"
+export PATH="/opt/homebrew/bin:$AQUA_ROOT_DIR/bin:$PATH"
 
 BASE_DIR="${1:-$HOME/Documents/Dev}"
 
