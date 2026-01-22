@@ -1,10 +1,12 @@
 eval "$(/opt/homebrew/bin/brew shellenv)"
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
 
-# aqua (CLI version manager)
+# aqua (CLI version manager) - bun, pnpm等を管理
 export AQUA_ROOT_DIR="${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}"
 export PATH="$AQUA_ROOT_DIR/bin:$PATH"
+
+# Volta (Node.js version manager)
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
@@ -197,14 +199,5 @@ export PATH="$HOME/.local/bin:$PATH"
 # Rust/Cargo
 . "$HOME/.cargo/env"
 
-# bun
+# bun completions (bun自体はaquaで管理)
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
-# pnpm
-export PNPM_HOME="$HOME/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac

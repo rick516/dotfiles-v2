@@ -34,3 +34,7 @@ packages:
   # Cloud & DevOps
   - name: aws/aws-cli@2.22.19
   - name: kubernetes/kubectl@v1.32.0
+
+  # Package Managers
+  - name: oven-sh/bun@bun-v1.3.5
+  - name: pnpm/pnpm@v10.26.1
