@@ -273,6 +273,27 @@ main() {
     log "  1. Restart your terminal (or run: exec zsh -l)"
     log "  2. Run 'p10k configure' to customize prompt (optional)"
     echo ""
+    log "======================================"
+    log "  TODO: Setup API Keys"
+    log "======================================"
+    echo ""
+    log "Create ~/.envrc with your API keys:"
+    echo ""
+    echo '  cat > ~/.envrc << '\''EOF'\'''
+    echo '  # API Keys (managed by direnv)'
+    echo '  '
+    echo '  # Productivity'
+    echo '  export NOTION_API_KEY="your-notion-api-key"'
+    echo '  '
+    echo '  # AI Services'
+    echo '  export GEMINI_API_KEY="your-gemini-api-key"'
+    echo '  export CONTEXT7_API_KEY="your-context7-api-key"'
+    echo '  export XAI_API_KEY="your-xai-api-key"'
+    echo '  export ZAI_API_KEY="your-zai-api-key"'
+    echo '  EOF'
+    echo ""
+    log "Then run: cd ~ && direnv allow"
+    echo ""
 }
 
 main "$@"
