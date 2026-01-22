@@ -176,25 +176,7 @@ gh auth login
 - HTTPS を選択
 - ブラウザで認証
 
-これにより、gitの認証情報が自動的に設定されます。
-
-### ユーザー名・メールの設定
-
-認証後、以下のコマンドでユーザー情報を設定してください：
-
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "your-email@example.com"
-```
-
-### 旧方式（generate_gitconfig.sh）
-
-従来の方式も引き続き使用可能です：
-
-```bash
-./generate_gitconfig.sh
-```
-
+これにより、gitの認証情報とユーザー情報が自動的に設定されます。
 
 ## トラブルシューティング
 
