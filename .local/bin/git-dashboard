@@ -82,7 +82,7 @@ main() {
         [ -z "$selected" ] && break
 
         repo_path=$(echo "$selected" | cut -f1)
-        [ -d "$repo_path" ] && lazygit -p "$repo_path"
+        [ -d "$repo_path" ] && zellij run --floating --close-on-exit -- lazygit -p "$repo_path"
     done
 }
 
