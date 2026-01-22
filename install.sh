@@ -284,6 +284,7 @@ main() {
     echo '  '
     echo '  # Productivity'
     echo '  export NOTION_API_KEY="your-notion-api-key"'
+    echo '  export SLACK_WEBHOOK_URL="your-slack-webhook-url"'
     echo '  '
     echo '  # AI Services'
     echo '  export GEMINI_API_KEY="your-gemini-api-key"'
