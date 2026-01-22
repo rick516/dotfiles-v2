@@ -24,7 +24,7 @@ packages:
   - name: tmux/tmux@3.5a
 
   # Terminal
-  - name: zellij-org/zellij@v0.41.2
+  - name: zellij-org/zellij@v0.43.1
   - name: sxyazi/yazi@v0.4.2
 
   # Git

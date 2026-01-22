@@ -2,6 +2,7 @@ eval "$(brew shellenv)"
 
 # aqua (CLI version manager) - bun, pnpm等を管理
 export AQUA_ROOT_DIR="${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}"
+export AQUA_GLOBAL_CONFIG="$HOME/dotfiles-v2/aqua.yaml"
 export PATH="$AQUA_ROOT_DIR/bin:$PATH"
 
 # Volta (Node.js version manager)

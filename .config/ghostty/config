@@ -21,7 +21,7 @@ cursor-style-blink = false
 mouse-hide-while-typing
 
 # 起動時にzellijをVSCode風レイアウトで起動
-command = /Users/username/.local/share/aquaproj-aqua/bin/zellij --layout vscode
+command = ~/.local/bin/zellij-launch --layout vscode
 
 # コマンド終了後も表示を維持
 wait-after-command = true
@@ -51,9 +51,11 @@ quick-terminal-animation-duration = 0.3
 keybind = cmd+shift+t=toggle_quick_terminal
 
 # クリップボード
+clipboard-read = allow
 clipboard-write = allow
 clipboard-trim-trailing-spaces = true
 copy-on-select = clipboard
+selection-invert-fg-bg = true
 
 # シェル統合
 shell-integration = detect

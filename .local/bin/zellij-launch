@@ -1,0 +1,36 @@
+#!/bin/bash
+# Wrapper script for launching zellij via aqua
+# Ghosttyが--noprofile --norcでbashを起動するため、PATH設定が必要
+
+export AQUA_ROOT_DIR="${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}"
+export AQUA_GLOBAL_CONFIG="$HOME/dotfiles-v2/aqua.yaml"
+export PATH="/opt/homebrew/bin:$AQUA_ROOT_DIR/bin:$PATH"
+
+# プロジェクトディレクトリ一覧（カスタマイズ可）
+PROJECT_DIRS=(
+    "$HOME"
+    "$HOME/Documents/Dev"
+    "$HOME/dotfiles-v2"
+)
+
+# 存在するディレクトリのみフィルタ + サブディレクトリも追加
+get_dirs() {
+    for dir in "${PROJECT_DIRS[@]}"; do
+        [ -d "$dir" ] && echo "$dir"
+        # Dev配下のプロジェクトも追加
+        if [ -d "$dir" ] && [[ "$dir" == *"/Dev"* ]]; then
+            find "$dir" -maxdepth 1 -type d 2>/dev/null
+        fi
+    done | sort -u
+}
+
+# fzfでディレクトリ選択
+selected=$(get_dirs | "$AQUA_ROOT_DIR/bin/fzf" --height=40% --reverse --prompt="Directory: ")
+
+# 選択されなかったらホームで起動
+if [ -z "$selected" ]; then
+    selected="$HOME"
+fi
+
+cd "$selected" || cd "$HOME"
+exec "$AQUA_ROOT_DIR/bin/zellij" "$@"
