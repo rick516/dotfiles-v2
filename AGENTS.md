@@ -4,11 +4,33 @@
 
 - **git commitは絶対に勝手に行わないこと**: コミットはユーザーの明示的な許可を得てから実行する。スキルやサブエージェントを含む全ての操作において、自動的にコミットしてはならない。
 
+- **個人情報を含めないこと**: このリポジトリはPublicのため、以下の情報を絶対に含めない：
+  - ユーザー名（`/Users/username/` 等のハードコードパス）
+  - メールアドレス
+  - APIキー・トークン
+  - その他個人を特定できる情報
+
+- **__HOME__プレースホルダーを使用すること**: パスにホームディレクトリを含める場合は、ハードコードせず `__HOME__` プレースホルダーを使用する。
+  ```
+  # 正しい
+  command = __HOME__/.local/bin/script
+
+  # 間違い（個人情報漏洩）
+  command = /Users/username/.local/bin/script
+  ```
+  `install.sh` がコピー時に `$HOME` に展開する。
+
+- **機密ファイルは.gitignoreに追加すること**: `.envrc`、認証情報を含むファイルは必ず `.gitignore` に追加する。
+
 ## Project Structure
 
 ```
 ./
-├── .config/              # XDG準拠の設定
+├── .claude/              # Claude Code設定
+│   └── skills/           # カスタマイズスキル
+│       ├── ghostty-config.md
+│       └── zellij-layout.md
+├── .config/              # XDG準拠の設定（__HOME__展開が必要）
 │   ├── ghostty/          # Ghosttyターミナル
 │   ├── nvim/             # Neovim
 │   ├── yazi/             # ファイルマネージャー
@@ -29,7 +51,7 @@
 
 ## Commands
 
-- `./install.sh` - フルインストール（Homebrew、prezto、dotfilesリンク、Neovimプラグイン）
+- `./install.sh` - フルインストール（Homebrew、prezto、dotfilesリンク、__HOME__展開、Neovimプラグイン）
 - `./scripts/generate_gitconfig.sh` - .gitconfigを生成
 - `./scripts/cleanup.sh` - $HOMEからリンクを削除（バックアップあり）
 
