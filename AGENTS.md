@@ -22,6 +22,14 @@
 
 - **機密ファイルは.gitignoreに追加すること**: `.envrc`、認証情報を含むファイルは必ず `.gitignore` に追加する。
 
+- **個人情報をコミットしたら履歴ごと消すこと**: PRでは過去の履歴は消えない。`git filter-repo`でforce-pushが必要。
+  ```bash
+  # 履歴から個人情報を削除
+  git filter-repo --replace-text <(echo "個人名==>username") --force
+  git remote add origin <url>
+  git push --force origin main  # ブランチ保護の一時解除が必要
+  ```
+
 ## Project Structure
 
 ```
