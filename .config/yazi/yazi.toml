@@ -1,0 +1,68 @@
+# Yazi メイン設定
+
+[opener]
+# テキストファイル: zellijフローティングでnvim
+edit = [
+    { run = 'zellij run --floating --close-on-exit -- nvim "$@"', block = true, for = "unix" },
+]
+
+# 画像: zellijフローティングでプレビュー
+image = [
+    { run = 'zellij run --floating --close-on-exit -- imgcat "$@"', block = true, for = "unix" },
+]
+
+# フォールバック: lessで表示
+fallback = [
+    { run = 'zellij run --floating --close-on-exit -- less "$@"', block = true, for = "unix" },
+]
+
+[open]
+rules = [
+    # テキスト系
+    { name = "*.md", use = "edit" },
+    { name = "*.txt", use = "edit" },
+    { name = "*.json", use = "edit" },
+    { name = "*.yaml", use = "edit" },
+    { name = "*.yml", use = "edit" },
+    { name = "*.toml", use = "edit" },
+    { name = "*.rb", use = "edit" },
+    { name = "*.js", use = "edit" },
+    { name = "*.ts", use = "edit" },
+    { name = "*.tsx", use = "edit" },
+    { name = "*.jsx", use = "edit" },
+    { name = "*.py", use = "edit" },
+    { name = "*.sh", use = "edit" },
+    { name = "*.css", use = "edit" },
+    { name = "*.scss", use = "edit" },
+    { name = "*.html", use = "edit" },
+    { name = "*.vue", use = "edit" },
+    { name = "*.go", use = "edit" },
+    { name = "*.rs", use = "edit" },
+    { name = "*.c", use = "edit" },
+    { name = "*.h", use = "edit" },
+    { name = "*.cpp", use = "edit" },
+    { name = "*.kdl", use = "edit" },
+    { name = "*.sql", use = "edit" },
+    { name = "*.env*", use = "edit" },
+    { name = "*.gitignore", use = "edit" },
+    { name = "Makefile", use = "edit" },
+    { name = "Dockerfile*", use = "edit" },
+    { name = "*.erb", use = "edit" },
+    { name = "*.slim", use = "edit" },
+    { name = "*.haml", use = "edit" },
+
+    # 画像
+    { name = "*.png", use = "image" },
+    { name = "*.jpg", use = "image" },
+    { name = "*.jpeg", use = "image" },
+    { name = "*.gif", use = "image" },
+    { name = "*.webp", use = "image" },
+    { name = "*.svg", use = "edit" },
+
+    # MIMEタイプでフォールバック
+    { mime = "text/*", use = "edit" },
+    { mime = "image/*", use = "image" },
+
+    # その他
+    { name = "*", use = "fallback" },
+]

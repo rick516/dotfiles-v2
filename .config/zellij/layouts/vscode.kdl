@@ -1,15 +1,15 @@
 // VSCode風レイアウト
 layout {
     pane split_direction="vertical" {
-        pane size="20%" split_direction="horizontal" {
+        pane size="25%" split_direction="horizontal" {
             pane size="60%" {
-                command "yazi"
+                command "/opt/homebrew/bin/yazi"
             }
             pane size="40%" {
-                command "git-dashboard"
+                command "/Users/koichiromurakami/.local/bin/git-dashboard"
             }
         }
-        pane size="80%" split_direction="horizontal" {
+        pane size="75%" split_direction="horizontal" {
             pane size="50%" split_direction="vertical" {
                 pane
                 pane

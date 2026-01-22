@@ -1,6 +1,9 @@
 #!/bin/bash
 # git-dashboard: 複数リポジトリの状態一覧 + lazygitで詳細表示
 
+# PATHにHomebrewを追加（zellij経由で起動時に必要）
+export PATH="/opt/homebrew/bin:$PATH"
+
 BASE_DIR="${1:-$HOME/Documents/Dev}"
 
 # 色定義
@@ -9,7 +12,8 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+DIM='\033[2m'
+NC='\033[0m'
 
 get_repo_status() {
     local repo_path="$1"
@@ -22,74 +26,63 @@ get_repo_status() {
 
     # ステータス取得
     local status=$(git status --porcelain 2>/dev/null)
-    local modified=$(echo "$status" | grep -c "^ M\|^M\|^MM" 2>/dev/null || echo 0)
-    local staged=$(echo "$status" | grep -c "^A\|^M \|^R\|^D " 2>/dev/null || echo 0)
-    local untracked=$(echo "$status" | grep -c "^??" 2>/dev/null || echo 0)
+    local modified=$(echo "$status" | grep -c "^ M\|^M\|^MM" 2>/dev/null | tr -d '\n' || echo 0)
+    local staged=$(echo "$status" | grep -c "^A\|^M \|^R\|^D " 2>/dev/null | tr -d '\n' || echo 0)
+    local untracked=$(echo "$status" | grep -c "^??" 2>/dev/null | tr -d '\n' || echo 0)
 
     # ahead/behind
     local ahead_behind=$(git rev-list --left-right --count @{upstream}...HEAD 2>/dev/null || echo "0	0")
     local behind=$(echo "$ahead_behind" | cut -f1)
     local ahead=$(echo "$ahead_behind" | cut -f2)
 
-    # ステータスアイコン構築
-    local status_icon=""
-    if [ "$modified" -gt 0 ] || [ "$staged" -gt 0 ] || [ "$untracked" -gt 0 ]; then
-        status_icon="${RED}✗${NC}"
-        [ "$modified" -gt 0 ] && status_icon="$status_icon ${YELLOW}M$modified${NC}"
-        [ "$staged" -gt 0 ] && status_icon="$status_icon ${GREEN}S$staged${NC}"
-        [ "$untracked" -gt 0 ] && status_icon="$status_icon ${CYAN}?$untracked${NC}"
+    # ステータス表示（わかりやすく）
+    local status_text=""
+    local total_changes=$((modified + staged + untracked))
+
+    if [ "$total_changes" -eq 0 ]; then
+        status_text="${GREEN}clean${NC}"
     else
-        status_icon="${GREEN}✔${NC}"
+        local parts=()
+        [ "$modified" -gt 0 ] && parts+=("${YELLOW}${modified}編集${NC}")
+        [ "$staged" -gt 0 ] && parts+=("${GREEN}${staged}staged${NC}")
+        [ "$untracked" -gt 0 ] && parts+=("${CYAN}${untracked}new${NC}")
+        status_text=$(IFS=' '; echo "${parts[*]}")
     fi
 
-    # ahead/behind表示
-    local sync_status=""
-    [ "$ahead" -gt 0 ] && sync_status="${GREEN}↑$ahead${NC}"
-    [ "$behind" -gt 0 ] && sync_status="$sync_status${RED}↓$behind${NC}"
+    # 同期状態
+    local sync_text=""
+    if [ "$ahead" -gt 0 ] && [ "$behind" -gt 0 ]; then
+        sync_text="${YELLOW}↑${ahead} ↓${behind}${NC}"
+    elif [ "$ahead" -gt 0 ]; then
+        sync_text="${GREEN}↑${ahead} push可${NC}"
+    elif [ "$behind" -gt 0 ]; then
+        sync_text="${RED}↓${behind} pull必要${NC}"
+    fi
 
     # 出力（タブ区切りでfzf用）
-    printf "%s\t%-20s\t%-15s\t%b\t%s\n" "$repo_path" "$repo_name" "$branch" "$status_icon" "$sync_status"
-}
-
-show_dashboard() {
-    clear
-    echo -e "${BLUE}━━━ Git Dashboard ━━━${NC}"
-    echo -e "${CYAN}Base: $BASE_DIR${NC}"
-    echo ""
-    printf "%-20s %-15s %-20s %s\n" "Repository" "Branch" "Status" "Sync"
-    echo "─────────────────────────────────────────────────────────"
-
-    # 全リポジトリを検索してステータス表示
-    while IFS= read -r git_dir; do
-        repo_path=$(dirname "$git_dir")
-        get_repo_status "$repo_path"
-    done < <(find "$BASE_DIR" -maxdepth 3 -name ".git" -type d 2>/dev/null | sort)
+    # 形式: path \t repo \t branch \t status \t sync
+    printf "%s\t%s\t%s\t%b\t%b\n" "$repo_path" "$repo_name" "$branch" "$status_text" "$sync_text"
 }
 
 main() {
     while true; do
-        # ダッシュボード表示 + fzfで選択
         selected=$(
             {
-                echo -e "\t${BLUE}[リポジトリを選択してEnter / Ctrl+Cで終了]${NC}\t\t"
                 while IFS= read -r git_dir; do
                     repo_path=$(dirname "$git_dir")
                     get_repo_status "$repo_path"
                 done < <(find "$BASE_DIR" -maxdepth 3 -name ".git" -type d 2>/dev/null | sort)
             } | fzf --ansi \
-                    --header="Git Dashboard | Enter: lazygit | Ctrl-C: exit" \
-                    --preview="cd {1} && git log --oneline -10 --color=always 2>/dev/null || echo 'No commits'" \
-                    --preview-window=right:40% \
+                    --header="Enter: lazygit で開く" \
                     --delimiter="\t" \
-                    --with-nth=2,3,4,5
+                    --with-nth=2,3,4,5 \
+                    --tabstop=4
         )
 
-        # 選択なしなら終了
         [ -z "$selected" ] && break
 
-        # パスを抽出してlazygit起動
         repo_path=$(echo "$selected" | cut -f1)
-        [ -d "$repo_path" ] && lazygit -p "$repo_path"
+        [ -d "$repo_path" ] && zellij run --floating --close-on-exit -- lazygit -p "$repo_path"
     done
 }
 
