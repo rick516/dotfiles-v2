@@ -1,0 +1,7 @@
+# Yazi キーバインド設定
+
+[manager]
+prepend_keymap = [
+    # ? でヘルプ表示（~ の代わり）
+    { on = "?", run = "help", desc = "ヘルプを表示" },
+]

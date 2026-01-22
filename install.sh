@@ -90,6 +90,15 @@ install_ghostty() {
     brew install --cask ghostty || log "Warning: Ghostty installation failed"
 }
 
+install_fonts() {
+    if brew list --cask font-plemol-jp-nf &>/dev/null 2>&1; then
+        log "PlemolJP Nerd Font: already installed"
+        return
+    fi
+    log "Installing PlemolJP Nerd Font..."
+    brew install --cask font-plemol-jp-nf || log "Warning: Font installation failed"
+}
+
 install_keifu() {
     if command -v keifu &>/dev/null; then
         log "keifu: already installed"
@@ -218,6 +227,7 @@ main() {
     # 3. GUI apps & cargo tools
     log "--- Applications ---"
     install_ghostty
+    install_fonts
     install_keifu
 
     # 4. Shell frameworks

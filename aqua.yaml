@@ -29,3 +29,7 @@ packages:
 
   # Git
   - name: jesseduffield/lazygit@v0.44.1
+  - name: cli/cli@v2.63.2  # GitHub CLI (gh)
+
+  # Cloud
+  - name: aws/aws-cli@2.22.19
