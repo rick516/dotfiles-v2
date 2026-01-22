@@ -3,7 +3,7 @@ layout {
     pane split_direction="vertical" {
         pane size="25%" split_direction="horizontal" {
             pane size="60%" {
-                command "/opt/homebrew/bin/yazi"
+                command "/Users/username/.local/share/aquaproj-aqua/bin/yazi"
             }
             pane size="40%" {
                 command "/Users/username/.local/bin/git-dashboard"
