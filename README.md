@@ -28,6 +28,27 @@
   - マウスサポート
 - 簡単なインストールとアップデートプロセス
 
+## 構造
+
+```
+./
+├── .config/              # XDG準拠の設定
+│   ├── ghostty/          # Ghosttyターミナル
+│   ├── nvim/             # Neovim
+│   ├── yazi/             # ファイルマネージャー
+│   └── zellij/           # ターミナルマルチプレクサ
+├── .local/bin/           # カスタムスクリプト
+├── shell/                # シェル設定
+│   ├── .zshrc, .zshenv   # zsh
+│   ├── .zpreztorc        # prezto
+│   ├── .p10k.zsh         # powerlevel10k
+│   ├── .bashrc           # bash
+│   └── .tmux.conf        # tmux
+├── install.sh            # インストーラー
+├── cleanup.sh            # クリーンアップ
+└── aqua.yaml             # CLIツール定義
+```
+
 ## インストール
 
 1. このリポジトリをクローンします：
