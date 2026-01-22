@@ -6,17 +6,18 @@
 
 ## Project Structure & Module Organization
 
-- Root dotfiles live at the repo top level (e.g., `.zshrc`, `.tmux.conf`, `.p10k.zsh`).
-- Neovim config is under `.config/nvim/init.lua`.
-- Editor settings are in `.vscode/settings.json`.
-- Install/maintenance scripts: `install.sh`, `cleanup.sh`, `generate_gitconfig.sh`.
+- Shell configs are in `shell/` (e.g., `.zshrc`, `.tmux.conf`, `.p10k.zsh`).
+- XDG configs are in `.config/` (nvim, ghostty, yazi, zellij).
+- Custom scripts are in `.local/bin/` (e.g., `git-dashboard`).
+- Maintenance scripts are in `scripts/` (`cleanup.sh`, `generate_gitconfig.sh`).
+- Entry point `install.sh` remains at root.
 - Backups created by scripts are stored under `backups/` with timestamped names.
 
 ## Build, Test, and Development Commands
 
 - `./install.sh` sets up Homebrew packages, installs prezto/powerlevel10k, links dotfiles into `$HOME`, and installs Neovim plugins.
-- `./generate_gitconfig.sh` generates `$HOME/.gitconfig` from `.gitconfig_template` if missing.
-- `./cleanup.sh` removes linked dotfiles from `$HOME` and backs them up. Use with caution; it deletes local files.
+- `./scripts/generate_gitconfig.sh` generates `$HOME/.gitconfig` from `.gitconfig_template` if missing.
+- `./scripts/cleanup.sh` removes linked dotfiles from `$HOME` and backs them up. Use with caution; it deletes local files.
 
 ## Coding Style & Naming Conventions
 

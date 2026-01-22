@@ -44,8 +44,10 @@
 │   ├── .p10k.zsh         # powerlevel10k
 │   ├── .bashrc           # bash
 │   └── .tmux.conf        # tmux
-├── install.sh            # インストーラー
-├── cleanup.sh            # クリーンアップ
+├── scripts/              # メンテナンススクリプト
+│   ├── cleanup.sh
+│   └── generate_gitconfig.sh
+├── install.sh            # インストーラー（エントリーポイント）
 └── aqua.yaml             # CLIツール定義
 ```
 

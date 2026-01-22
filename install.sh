@@ -203,9 +203,9 @@ setup_gitconfig() {
         log ".gitconfig: already exists"
         return
     fi
-    if [ -f "$DOTFILES_DIR/generate_gitconfig.sh" ]; then
+    if [ -f "$DOTFILES_DIR/scripts/generate_gitconfig.sh" ]; then
         log "Generating .gitconfig..."
-        source "$DOTFILES_DIR/generate_gitconfig.sh"
+        source "$DOTFILES_DIR/scripts/generate_gitconfig.sh"
     fi
 }
 
