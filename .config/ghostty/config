@@ -1,0 +1,68 @@
+# Ghostty Configuration
+
+# テーマ
+theme = TokyoNight
+
+# フォント設定
+font-family = "PlemolJP35 Console NF"
+font-thicken
+adjust-cell-height = 2
+
+# 背景（透過 + ブラー）
+background = 000
+background-opacity = 0.70
+background-blur = true
+
+# カーソル
+cursor-style = block
+cursor-style-blink = false
+
+# マウス
+mouse-hide-while-typing
+
+# 起動時にzellijをVSCode風レイアウトで起動
+command = /opt/homebrew/bin/zellij --layout vscode
+
+# コマンド終了後も表示を維持
+wait-after-command = true
+
+# ウィンドウ設定
+title = " "
+window-padding-x = 5
+window-padding-y = 5
+window-padding-balance = true
+window-inherit-working-directory = true
+window-new-tab-position = current
+
+# 全画面表示
+fullscreen
+macos-non-native-fullscreen = true
+macos-titlebar-style = transparent
+
+# アイコンカスタマイズ
+macos-icon = custom-style
+macos-icon-ghost-color = fa5
+macos-icon-screen-color = 000
+
+# クイックターミナル
+quick-terminal-screen = mouse
+quick-terminal-position = right
+quick-terminal-animation-duration = 0.3
+keybind = cmd+shift+t=toggle_quick_terminal
+
+# クリップボード
+clipboard-write = allow
+clipboard-trim-trailing-spaces = true
+copy-on-select = clipboard
+
+# シェル統合
+shell-integration = detect
+
+# OptionキーをAltとして使用（zellij等のキーバインド用）
+macos-option-as-alt = true
+
+# スクロール
+scrollback-limit = 10000
+
+# 確認なしで閉じる
+confirm-close-surface = false

@@ -33,11 +33,90 @@ HOME_DIR=$(eval echo ~$USER)
 # 必要なパッケージのインストール
 install_packages() {
     log "Installing necessary packages..."
-    brew install fzf ripgrep neovim tmux || error "Failed to install packages"
-    
+    brew install fzf ripgrep neovim tmux direnv || error "Failed to install packages"
+
     # fzfのインストール時に.zshrcを変更しないようにする
     $(brew --prefix)/opt/fzf/install --no-update-rc --key-bindings --completion || error "Failed to install fzf"
+}
 
+# Rustのインストール
+install_rust() {
+    if ! command -v rustc &>/dev/null; then
+        log "Installing Rust..."
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y || error "Failed to install Rust"
+        source "$HOME/.cargo/env"
+    else
+        log "Rust is already installed."
+    fi
+}
+
+# Voltaのインストール (Node.js管理)
+install_volta() {
+    if ! command -v volta &>/dev/null; then
+        log "Installing Volta..."
+        curl https://get.volta.sh | bash -s -- --skip-setup || error "Failed to install Volta"
+    else
+        log "Volta is already installed."
+    fi
+}
+
+# ターミナル関連ツールのインストール
+install_terminal_tools() {
+    log "Installing terminal tools..."
+
+    # Ghostty (caskでインストール)
+    if ! brew list --cask ghostty &>/dev/null; then
+        log "Installing Ghostty..."
+        brew install --cask ghostty || log "Warning: Failed to install Ghostty"
+    else
+        log "Ghostty is already installed."
+    fi
+
+    # zellij, yazi, lazygit
+    brew install zellij yazi lazygit || log "Warning: Some terminal tools failed to install"
+
+    # Rust製ツール (keifu)
+    if command -v cargo &>/dev/null; then
+        log "Installing keifu via cargo..."
+        cargo install keifu 2>/dev/null || log "Warning: keifu installation skipped"
+    fi
+}
+
+# Ghostty設定のセットアップ (macOS専用パス)
+setup_ghostty() {
+    log "Setting up Ghostty configuration..."
+    local ghostty_src="$DOTFILES_DIR/.config/ghostty/config"
+    local ghostty_dest="$HOME/Library/Application Support/com.mitchellh.ghostty/config"
+
+    if [ -f "$ghostty_src" ]; then
+        mkdir -p "$(dirname "$ghostty_dest")"
+        create_symlink "$ghostty_src" "$ghostty_dest"
+    else
+        log "Ghostty config not found in dotfiles, skipping..."
+    fi
+}
+
+# .local/bin スクリプトのセットアップ
+setup_local_bin() {
+    log "Setting up local bin scripts..."
+    local bin_src="$DOTFILES_DIR/.local/bin"
+    local bin_dest="$HOME/.local/bin"
+
+    if [ -d "$bin_src" ]; then
+        mkdir -p "$bin_dest"
+        for script in "$bin_src"/*; do
+            if [ -f "$script" ]; then
+                local script_name=$(basename "$script")
+                create_symlink "$script" "$bin_dest/$script_name"
+                chmod +x "$bin_dest/$script_name"
+            fi
+        done
+
+        # PATHに追加されているか確認
+        if ! echo "$PATH" | grep -q "$bin_dest"; then
+            log "Note: Add $bin_dest to your PATH in .zshrc"
+        fi
+    fi
 }
 
 # Neovimの設定
@@ -165,6 +244,9 @@ EXCLUDE_PATTERNS=(
     "generate_gitconfig.sh"
     "cleanup.sh"
     "backups"
+    "CLAUDE.md"
+    "AGENTS.md"
+    ".local"
 )
 
 # preztoのインストールと設定
@@ -341,6 +423,9 @@ main() {
 
     install_homebrew
     install_packages
+    install_rust
+    install_volta
+    install_terminal_tools
     setup_neovim
     install_prezto
     install_powerline10k
@@ -348,11 +433,16 @@ main() {
     log "Processing dotfiles..."
     process_directory "$DOTFILES_DIR"
 
+    # 追加のセットアップ
+    setup_ghostty
+    setup_local_bin
+
     generate_gitconfig
     install_neovim_plugins
 
     log "Installation complete! Please restart your terminal or run 'source ~/.zshrc' to apply the changes."
     log "To customize your zsh prompt further, run 'p10k configure' after restarting your terminal."
+    log "For Ghostty users: Restart Ghostty to apply the new configuration."
 }
 
 # スクリプトの実行

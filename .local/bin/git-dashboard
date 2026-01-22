@@ -1,0 +1,96 @@
+#!/bin/bash
+# git-dashboard: 複数リポジトリの状態一覧 + lazygitで詳細表示
+
+BASE_DIR="${1:-$HOME/Documents/Dev}"
+
+# 色定義
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+get_repo_status() {
+    local repo_path="$1"
+    local repo_name=$(basename "$repo_path")
+
+    cd "$repo_path" 2>/dev/null || return
+
+    # ブランチ名
+    local branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null || echo "?")
+
+    # ステータス取得
+    local status=$(git status --porcelain 2>/dev/null)
+    local modified=$(echo "$status" | grep -c "^ M\|^M\|^MM" 2>/dev/null || echo 0)
+    local staged=$(echo "$status" | grep -c "^A\|^M \|^R\|^D " 2>/dev/null || echo 0)
+    local untracked=$(echo "$status" | grep -c "^??" 2>/dev/null || echo 0)
+
+    # ahead/behind
+    local ahead_behind=$(git rev-list --left-right --count @{upstream}...HEAD 2>/dev/null || echo "0	0")
+    local behind=$(echo "$ahead_behind" | cut -f1)
+    local ahead=$(echo "$ahead_behind" | cut -f2)
+
+    # ステータスアイコン構築
+    local status_icon=""
+    if [ "$modified" -gt 0 ] || [ "$staged" -gt 0 ] || [ "$untracked" -gt 0 ]; then
+        status_icon="${RED}✗${NC}"
+        [ "$modified" -gt 0 ] && status_icon="$status_icon ${YELLOW}M$modified${NC}"
+        [ "$staged" -gt 0 ] && status_icon="$status_icon ${GREEN}S$staged${NC}"
+        [ "$untracked" -gt 0 ] && status_icon="$status_icon ${CYAN}?$untracked${NC}"
+    else
+        status_icon="${GREEN}✔${NC}"
+    fi
+
+    # ahead/behind表示
+    local sync_status=""
+    [ "$ahead" -gt 0 ] && sync_status="${GREEN}↑$ahead${NC}"
+    [ "$behind" -gt 0 ] && sync_status="$sync_status${RED}↓$behind${NC}"
+
+    # 出力（タブ区切りでfzf用）
+    printf "%s\t%-20s\t%-15s\t%b\t%s\n" "$repo_path" "$repo_name" "$branch" "$status_icon" "$sync_status"
+}
+
+show_dashboard() {
+    clear
+    echo -e "${BLUE}━━━ Git Dashboard ━━━${NC}"
+    echo -e "${CYAN}Base: $BASE_DIR${NC}"
+    echo ""
+    printf "%-20s %-15s %-20s %s\n" "Repository" "Branch" "Status" "Sync"
+    echo "─────────────────────────────────────────────────────────"
+
+    # 全リポジトリを検索してステータス表示
+    while IFS= read -r git_dir; do
+        repo_path=$(dirname "$git_dir")
+        get_repo_status "$repo_path"
+    done < <(find "$BASE_DIR" -maxdepth 3 -name ".git" -type d 2>/dev/null | sort)
+}
+
+main() {
+    while true; do
+        # ダッシュボード表示 + fzfで選択
+        selected=$(
+            {
+                echo -e "\t${BLUE}[リポジトリを選択してEnter / Ctrl+Cで終了]${NC}\t\t"
+                while IFS= read -r git_dir; do
+                    repo_path=$(dirname "$git_dir")
+                    get_repo_status "$repo_path"
+                done < <(find "$BASE_DIR" -maxdepth 3 -name ".git" -type d 2>/dev/null | sort)
+            } | fzf --ansi \
+                    --header="Git Dashboard | Enter: lazygit | Ctrl-C: exit" \
+                    --preview="cd {1} && git log --oneline -10 --color=always 2>/dev/null || echo 'No commits'" \
+                    --preview-window=right:40% \
+                    --delimiter="\t" \
+                    --with-nth=2,3,4,5
+        )
+
+        # 選択なしなら終了
+        [ -z "$selected" ] && break
+
+        # パスを抽出してlazygit起動
+        repo_path=$(echo "$selected" | cut -f1)
+        [ -d "$repo_path" ] && lazygit -p "$repo_path"
+    done
+}
+
+main

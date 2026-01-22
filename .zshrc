@@ -87,6 +87,9 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias sz='source ~/.zshrc'
 
+# AI系
+alias cdsp='claude --dangerously-skip-permissions'
+
 # nvimエイリアス
 alias vim='nvim'
 alias vi='nvim'
@@ -180,3 +183,12 @@ fi
 
 # Neovimとターミナルを切り替えるエイリアス
 alias nvim-toggle='nvim -c "ToggleTerm"'
+
+# direnv
+eval "$(direnv hook zsh)"
+
+# .local/bin
+export PATH="$HOME/.local/bin:$PATH"
+
+# Rust/Cargo
+. "$HOME/.cargo/env"
