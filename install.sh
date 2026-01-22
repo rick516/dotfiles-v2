@@ -99,6 +99,24 @@ install_fonts() {
     brew install --cask font-plemol-jp-nf || log "Warning: Font installation failed"
 }
 
+install_docker() {
+    if [ -d "/Applications/Docker.app" ] || brew list --cask docker &>/dev/null 2>&1; then
+        log "Docker Desktop: already installed"
+        return
+    fi
+    log "Installing Docker Desktop..."
+    brew install --cask docker || log "Warning: Docker installation failed"
+}
+
+install_aws_vault() {
+    if brew list --cask aws-vault &>/dev/null 2>&1; then
+        log "aws-vault: already installed"
+        return
+    fi
+    log "Installing aws-vault..."
+    brew install --cask aws-vault || log "Warning: aws-vault installation failed"
+}
+
 install_keifu() {
     if command -v keifu &>/dev/null; then
         log "keifu: already installed"
@@ -228,6 +246,8 @@ main() {
     log "--- Applications ---"
     install_ghostty
     install_fonts
+    install_docker
+    install_aws_vault
     install_keifu
 
     # 4. Shell frameworks

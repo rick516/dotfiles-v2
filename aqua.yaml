@@ -31,5 +31,6 @@ packages:
   - name: jesseduffield/lazygit@v0.44.1
   - name: cli/cli@v2.63.2  # GitHub CLI (gh)
 
-  # Cloud
+  # Cloud & DevOps
   - name: aws/aws-cli@2.22.19
+  - name: kubernetes/kubectl@v1.32.0
