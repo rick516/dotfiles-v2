@@ -161,14 +161,12 @@ setup_powerlevel10k() {
 setup_dotfiles() {
     log "Setting up dotfiles..."
 
-    # Shell configs
-    local shell_files=(
-        ".bashrc" ".profile" ".zshrc" ".zshenv" ".zprofile"
-        ".zlogin" ".zlogout" ".zpreztorc" ".p10k.zsh" ".tmux.conf"
-    )
-    for file in "${shell_files[@]}"; do
-        [ -f "$DOTFILES_DIR/$file" ] && create_symlink "$DOTFILES_DIR/$file" "$HOME/$file"
-    done
+    # Shell configs (from shell/ directory)
+    if [ -d "$DOTFILES_DIR/shell" ]; then
+        for file in "$DOTFILES_DIR/shell"/.*; do
+            [ -f "$file" ] && create_symlink "$file" "$HOME/$(basename "$file")"
+        done
+    fi
 
     # .config directories
     if [ -d "$DOTFILES_DIR/.config" ]; then
