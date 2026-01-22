@@ -27,4 +27,5 @@ if packer_bootstrap then
   require('packer').sync()
 end
 
-vim.opt.rtp:append('/opt/homebrew/opt/fzf')
+local aqua_root = os.getenv('AQUA_ROOT_DIR') or (os.getenv('HOME') .. '/.local/share/aquaproj-aqua')
+vim.opt.rtp:append(aqua_root .. '/pkgs/github_release/github.com/junegunn/fzf')

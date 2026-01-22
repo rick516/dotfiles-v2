@@ -42,6 +42,13 @@ fi
 # Ensure path arrays do not contain duplicates.
 typeset -gU cdpath fpath mailpath path
 
+# Aqua package manager
+export AQUA_ROOT_DIR="${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}"
+path=(
+  $AQUA_ROOT_DIR/bin(N)
+  $path
+)
+
 # Set the list of directories that cd searches.
 # cdpath=(
 #   $cdpath

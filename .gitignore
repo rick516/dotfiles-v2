@@ -1,3 +1,6 @@
 .gitconfig
 backups/
 .vscode.DS_Store
+
+# Neovim packer compiled (user-specific paths)
+.config/nvim/plugin/packer_compiled.lua
