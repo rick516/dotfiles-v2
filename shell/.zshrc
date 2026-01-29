@@ -205,3 +205,6 @@ export PATH="$HOME/.local/bin:$PATH"
 # bun completions (bun自体はaquaで管理)
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 export PATH=$PATH:$HOME/.maestro/bin
+
+# opencode
+export PATH=__HOME__/.opencode/bin:$PATH
