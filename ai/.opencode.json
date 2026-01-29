@@ -1,6 +1,14 @@
 {
-  "provider": "anthropic",
-  "model": "claude-sonnet-4-20250514",
+  "$schema": "https://opencode.ai/config.json",
+  "model": "zai/glm-4.7",
+  "provider": {
+    "zai": {
+      "options": {
+        "baseURL": "https://api.z.ai/api/coding/paas/v4"
+      }
+    }
+  },
+  "enabled_providers": ["zai"],
   "shell": {
     "path": "/bin/zsh",
     "args": ["-l"]
