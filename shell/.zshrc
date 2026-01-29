@@ -94,8 +94,10 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias sz='source ~/.zshrc'
 
-# AI系
+# AI CLI Tools
 alias cdsp='claude --dangerously-skip-permissions'
+alias oc='opencode'
+alias cx='codex'
 
 # nvimエイリアス
 alias vim='nvim'
@@ -202,3 +204,4 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # bun completions (bun自体はaquaで管理)
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+export PATH=$PATH:$HOME/.maestro/bin

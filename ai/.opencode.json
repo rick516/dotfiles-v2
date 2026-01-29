@@ -1,0 +1,8 @@
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-4-20250514",
+  "shell": {
+    "path": "/bin/zsh",
+    "args": ["-l"]
+  }
+}

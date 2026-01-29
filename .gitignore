@@ -1,6 +1,20 @@
+# Personal info - NEVER commit
 .gitconfig
+.envrc
+*.local.json
+*secrets*
+*credentials*
+
+# Backups
 backups/
+
+# macOS
+.DS_Store
 .vscode.DS_Store
 
 # Neovim packer compiled (user-specific paths)
 .config/nvim/plugin/packer_compiled.lua
+
+# AI CLI auth tokens (auto-generated)
+ai/claude/auth/
+ai/.opencode-auth/

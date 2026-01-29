@@ -131,6 +131,43 @@ install_keifu() {
 }
 
 # =============================================================================
+# AI CLI Tools
+# =============================================================================
+
+install_opencode() {
+    if command -v opencode &>/dev/null; then
+        log "opencode: already installed"
+        return
+    fi
+    log "Installing opencode..."
+    brew tap opencode-ai/tap
+    brew install opencode-ai/tap/opencode
+}
+
+install_claude_code() {
+    if command -v claude &>/dev/null; then
+        log "Claude Code: already installed"
+        return
+    fi
+    log "Installing Claude Code..."
+    curl -fsSL https://claude.ai/install.sh | bash
+}
+
+install_codex() {
+    if command -v codex &>/dev/null; then
+        log "Codex CLI: already installed"
+        return
+    fi
+    # bunでインストール（aquaで管理）
+    if command -v bun &>/dev/null; then
+        log "Installing Codex CLI via bun..."
+        bun install -g @openai/codex
+    else
+        log "Warning: bun not found, skipping codex installation"
+    fi
+}
+
+# =============================================================================
 # Shell Setup
 # =============================================================================
 
@@ -166,6 +203,14 @@ setup_dotfiles() {
         for file in "$DOTFILES_DIR/shell"/.*; do
             [ -f "$file" ] && create_symlink "$file" "$HOME/$(basename "$file")"
         done
+    fi
+
+    # AI CLI configs (from ai/ directory)
+    [ -f "$DOTFILES_DIR/ai/.opencode.json" ] && create_symlink "$DOTFILES_DIR/ai/.opencode.json" "$HOME/.opencode.json"
+    # Claude Code: skillsだけ管理（cache/debug等は実行時生成）
+    if [ -d "$DOTFILES_DIR/ai/claude/skills" ]; then
+        mkdir -p "$HOME/.claude"
+        create_symlink "$DOTFILES_DIR/ai/claude/skills" "$HOME/.claude/skills"
     fi
 
     # .config directories (ghostty/zellijは__HOME__展開が必要なのでコピー)
@@ -264,19 +309,25 @@ main() {
     install_aws_vault
     install_keifu
 
-    # 4. Shell frameworks
+    # 4. AI CLI Tools
+    log "--- AI CLI Tools ---"
+    install_opencode
+    install_claude_code
+    install_codex
+
+    # 5. Shell frameworks
     log "--- Shell Setup ---"
     setup_prezto
     setup_powerlevel10k
 
-    # 5. Dotfiles
+    # 6. Dotfiles
     log "--- Dotfiles ---"
     setup_dotfiles
     setup_ghostty_config
     setup_fzf
     setup_gitconfig
 
-    # 6. Editor plugins
+    # 7. Editor plugins
     log "--- Editor Plugins ---"
     install_neovim_plugins
 

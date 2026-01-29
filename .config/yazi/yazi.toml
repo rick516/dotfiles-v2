@@ -1,19 +1,19 @@
 # Yazi メイン設定
 
 [opener]
-# テキストファイル: zellijフローティングでnvim
+# テキストファイル: 新しいタブでnvim
 edit = [
-    { run = 'zellij run --floating --close-on-exit -- nvim "$@"', block = true, for = "unix" },
+    { run = 'zellij action new-tab && nvim "$@"', block = true, for = "unix" },
 ]
 
-# 画像: zellijフローティングでプレビュー
+# 画像: 新しいタブでプレビュー
 image = [
-    { run = 'zellij run --floating --close-on-exit -- imgcat "$@"', block = true, for = "unix" },
+    { run = 'zellij action new-tab && imgcat "$@"', block = true, for = "unix" },
 ]
 
-# フォールバック: lessで表示
+# フォールバック: 新しいタブでless
 fallback = [
-    { run = 'zellij run --floating --close-on-exit -- less "$@"', block = true, for = "unix" },
+    { run = 'zellij action new-tab && less "$@"', block = true, for = "unix" },
 ]
 
 [open]
