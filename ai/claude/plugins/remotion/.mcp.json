@@ -1,0 +1,6 @@
+{
+  "remotion-documentation": {
+    "command": "npx",
+    "args": ["@remotion/mcp@latest"]
+  }
+}
