@@ -54,12 +54,13 @@ install_aqua() {
         log "aqua: already installed"
     fi
 
-    # aqua PATH設定
+    # aqua PATH設定（Homebrew経由のaquaも含む）
     export AQUA_ROOT_DIR="${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}"
-    export PATH="$AQUA_ROOT_DIR/bin:$PATH"
+    export PATH="$AQUA_ROOT_DIR/bin:$(brew --prefix)/bin:$PATH"
+    export AQUA_GLOBAL_CONFIG="$DOTFILES_DIR/aqua.yaml"
 
     log "Installing CLI tools via aqua..."
-    cd "$DOTFILES_DIR" && aqua install
+    aqua install || log "Warning: Some aqua packages failed to install"
 }
 
 install_rust() {
@@ -82,7 +83,7 @@ install_volta() {
 }
 
 install_ghostty() {
-    if brew list --cask ghostty &>/dev/null 2>&1; then
+    if [ -d "/Applications/Ghostty.app" ] || brew list --cask ghostty &>/dev/null 2>&1; then
         log "Ghostty: already installed"
         return
     fi
