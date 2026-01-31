@@ -21,7 +21,6 @@ packages:
 
   # Shell Tools
   - name: direnv/direnv@v2.35.0
-  # tmux is installed via Homebrew (not available in aqua registry)
 
   # Terminal
   - name: zellij-org/zellij@v0.43.1
