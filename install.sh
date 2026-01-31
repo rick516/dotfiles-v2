@@ -60,7 +60,22 @@ install_aqua() {
     export AQUA_GLOBAL_CONFIG="$DOTFILES_DIR/aqua.yaml"
 
     log "Installing CLI tools via aqua..."
-    aqua install || log "Warning: Some aqua packages failed to install"
+    # -a: すべてのパッケージを即座にインストール（lazy installではなく）
+    aqua install -a || log "Warning: Some aqua packages failed to install"
+
+    # インストール確認
+    log "Verifying aqua packages..."
+    local failed=""
+    for cmd in fzf rg nvim direnv zellij yazi lazygit gh bun pnpm; do
+        if ! "$AQUA_ROOT_DIR/bin/$cmd" --version &>/dev/null 2>&1; then
+            failed="$failed $cmd"
+        fi
+    done
+    if [ -n "$failed" ]; then
+        log "Warning: Failed to verify:$failed"
+    else
+        log "All aqua packages installed successfully"
+    fi
 }
 
 install_rust() {
