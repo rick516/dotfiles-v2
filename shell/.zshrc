@@ -207,4 +207,6 @@ export PATH="$HOME/.local/bin:$PATH"
 export PATH=$PATH:$HOME/.maestro/bin
 
 # opencode
-export PATH=__HOME__/.opencode/bin:$PATH
+export PATH=$HOME/.opencode/bin:$PATH
+
+alias claude-mem='bun "$HOME/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'

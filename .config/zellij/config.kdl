@@ -279,3 +279,6 @@ web_client {
 }
 
 show_startup_tips false
+
+// ターミナルが強制終了されたときセッションを終了（ゾンビ防止）
+on_force_close "quit"
