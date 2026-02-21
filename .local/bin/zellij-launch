@@ -33,4 +33,11 @@ if [ -z "$selected" ]; then
 fi
 
 cd "$selected" || cd "$HOME"
-exec "$AQUA_ROOT_DIR/bin/zellij" "$@"
+
+# セッション名をディレクトリ名から生成（例: neima, dotfiles-v2, home）
+session_name=$(basename "$selected" | tr '[:upper:]' '[:lower:]' | tr ' .' '-')
+[ "$selected" = "$HOME" ] && session_name="home"
+
+# 既存セッションがあればattach、なければ新規作成
+# これによりGhosttyウィンドウを開き直してもセッションが増殖しない
+exec "$AQUA_ROOT_DIR/bin/zellij" attach --create "$session_name" "$@"
