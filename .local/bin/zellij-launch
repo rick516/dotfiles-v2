@@ -39,5 +39,18 @@ session_name=$(basename "$selected" | tr '[:upper:]' '[:lower:]' | tr ' .' '-')
 [ "$selected" = "$HOME" ] && session_name="home"
 
 # 既存セッションがあればattach、なければ新規作成
-# これによりGhosttyウィンドウを開き直してもセッションが増殖しない
-exec "$AQUA_ROOT_DIR/bin/zellij" attach --create "$session_name" "$@"
+# 実行時の引数(例: --layout)は新規作成時のみ渡す
+if "$AQUA_ROOT_DIR/bin/zellij" list-sessions 2>/dev/null | grep -q "^${session_name} "; then
+    exec "$AQUA_ROOT_DIR/bin/zellij" attach "$session_name"
+else
+    # Zellij 0.43では --session と --layout を同時に使うと「既存セッションへのタブ追加」になるため --new-session-with-layout に置換する
+    args=()
+    for arg in "$@"; do
+        if [ "$arg" = "--layout" ] || [ "$arg" = "-l" ]; then
+            args+=("--new-session-with-layout")
+        else
+            args+=("$arg")
+        fi
+    done
+    exec "$AQUA_ROOT_DIR/bin/zellij" --session "$session_name" "${args[@]}"
+fi
