@@ -1,6 +1,6 @@
 # dotfiles-v2 Skills
 
-dotfiles-v2のカスタマイズに特化したClaude Codeスキル集。
+Claude Codeスキル集。dotfiles カスタマイズ + 開発ワークフロー。
 
 ## 利用可能なスキル
 
@@ -8,6 +8,9 @@ dotfiles-v2のカスタマイズに特化したClaude Codeスキル集。
 |--------|------|
 | [ghostty-config](./ghostty-config.md) | Ghosttyターミナル設定カスタマイズ |
 | [zellij-layout](./zellij-layout.md) | zellijレイアウトカスタマイズ |
+| [foundry-solidity-dev](./foundry-solidity-dev/) | Foundry + OpenZeppelin でのスマートコントラクト開発 |
+| [smart-contract-security-review](./smart-contract-security-review/) | コントラクトの攻撃者/防御者視点セキュリティレビュー |
+| [beginner-friendly-docs](./beginner-friendly-docs/) | 初学者向け技術ドキュメント作成パターン |
 
 ## 使用方法
 
